@@ -317,7 +317,6 @@
     <!-- String indicating camera flash is not used. [CHAR LIMIT=14] -->
     <string name="flash_off">No flash</string>
 
-
     <!-- Toast message shown after we make some album(s) available offline [CHAR LIMIT=50] -->
     <plurals name="make_albums_available_offline">
         <item quantity="one">Making album available offline.</item>

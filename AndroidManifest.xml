@@ -244,13 +244,13 @@
         <activity android:name="com.android.gallery3d.gadget.WidgetClickHandler" />
         <activity android:name="com.android.gallery3d.app.DialogPicker"
                 android:configChanges="keyboardHidden|orientation|screenSize"
-                android:theme="@style/DialogPickerTheme"/>
+                android:theme="@style/DialogPickerTheme" />
         <activity android:name="com.android.gallery3d.app.AlbumPicker"
                 android:configChanges="keyboardHidden|orientation|screenSize"
-                android:theme="@style/DialogPickerTheme"/>
+                android:theme="@style/DialogPickerTheme" />
         <activity android:name="com.android.gallery3d.gadget.WidgetTypeChooser"
                 android:configChanges="keyboardHidden|orientation|screenSize"
-                android:theme="@android:style/Theme.Holo.Dialog"/>
+                android:theme="@android:style/Theme.Holo.Dialog" />
 
         <activity android:name="com.android.camera.Camera"
                 android:taskAffinity="com.android.camera"
@@ -316,15 +316,15 @@
         </receiver>
         <receiver android:name="com.android.gallery3d.app.PackagesMonitor">
             <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_ADDED"/>
-                <action android:name="android.intent.action.PACKAGE_REMOVED"/>
-                <action android:name="android.intent.action.PACKAGE_CHANGED"/>
-                <data android:scheme="package"/>
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <action android:name="android.intent.action.PACKAGE_CHANGED" />
+                <data android:scheme="package" />
             </intent-filter>
         </receiver>
         <receiver android:name="com.android.camera.CameraButtonIntentReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.CAMERA_BUTTON"/>
+                <action android:name="android.intent.action.CAMERA_BUTTON" />
             </intent-filter>
         </receiver>
         <receiver android:name="com.android.camera.DisableCameraReceiver">
@@ -333,7 +333,7 @@
             </intent-filter>
         </receiver>
         <service android:name="com.android.gallery3d.gadget.WidgetService"
-                android:permission="android.permission.BIND_REMOTEVIEWS"/>
+                android:permission="android.permission.BIND_REMOTEVIEWS" />
         <activity android:name="com.android.gallery3d.gadget.WidgetConfigure"
                 android:configChanges="keyboardHidden|orientation|screenSize"
                 android:theme="@style/android:Theme.Translucent.NoTitleBar">
