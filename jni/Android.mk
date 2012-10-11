@@ -13,4 +13,3 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := libjni_eglfence
 
 include $(BUILD_SHARED_LIBRARY)
-
