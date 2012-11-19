@@ -558,7 +558,7 @@ public class PhotoView extends GLView {
         // The second is that it assumes landscape is a 90 rotation from portrait,
         // however on landscape devices this is not true. Thus, if we are in portrait
         // on a landscape device, we need to invert the output
-        int orientation = mContext.getResources().getConfiguration().orientation;
+        int orientation = getGLRoot().getContext().getResources().getConfiguration().orientation;
         boolean invertPortrait = (orientation == Configuration.ORIENTATION_PORTRAIT
                 && (mDisplayRotation == 90 || mDisplayRotation == 270));
         boolean invert = (mDisplayRotation >= 180);
