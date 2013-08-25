@@ -14,6 +14,7 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="pref_camera_storage_title">Mentés helye</string>
     <string name="pref_camera_picturesize_entry_12_8mp">12,8 megapixel</string>
     <string name="pref_camera_picturesize_entry_11_5mp">11,5 megapixel</string>
     <string name="pref_camera_picturesize_entry_9mp">9 megapixel</string>
@@ -30,15 +31,11 @@
     <string name="pref_camera_picturesize_entry_svga">SVGA</string>
     <string name="pref_camera_picturesize_entry_wvga">WVGA</string>
     <string name="pref_camera_picturesize_entry_wqvga">WQVGA</string>
-    <plurals name="pref_camera_timer_entry">
-        <item quantity="one">1 sekund</item>
-        <item quantity="other">%d sekunder</item>
-    </plurals>
-    <string name="bass_boost_strength">Basforøgelse</string>
-    <string name="virtualizer_strength">3D-effekt</string>
-    <string name="audio_effects">Lydeffekter</string>
-    <string name="headset_plug">Tilslut hovedtelefoner til disse effekter.</string>
+    <string name="bass_boost_strength">Mélyhangkiemelés</string>
+    <string name="virtualizer_strength">3D effekt</string>
+    <string name="audio_effects">Hangeffektek</string>
+    <string name="headset_plug">Ezekhez az effektekhez csatlakoztasson fülhallgatót.</string>
     <string name="audio_effects_dialog_title">Snapdragon Audio+</string>
-    <string name="fail_trim">Beklager, denne video kan ikke trimmes</string>
-    <string name="can_not_trim">Kun mp4-filer kan trimmes</string>
+    <string name="fail_trim">Ez a videófájl nem vágható</string>
+    <string name="can_not_trim">Csak mp4 fájlok vághatóak</string>
 </resources>
