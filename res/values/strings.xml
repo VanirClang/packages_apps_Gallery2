@@ -1095,9 +1095,6 @@ CHAR LIMIT = NONE] -->
     <!-- settings label [CHAR LIMIT=50] -->
     <string name="camera_menu_settings_label">SETTINGS</string>
 
-    <!-- pulled from CM's proprietary string file because it's pointless to create more work for devs -->
-    <string name="filtershow_redo_toast">@string/filtershow_redo</string>
-
     <!-- String indicating how many photos are in an album [CHAR LIMIT=15] -->
     <plurals name="number_of_photos">
         <item quantity="one">%1$d photo</item>
