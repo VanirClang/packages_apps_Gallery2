@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
+ * Copyright (C) 2013 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -415,6 +416,12 @@ public class VideoModule implements CameraModule,
         mPrefVideoEffectDefault = mActivity.getString(R.string.pref_video_effect_default);
         resetEffect();
 
+        // Power shutter
+        mActivity.initPowerShutter(mPreferences);
+
+        // we need to reset exposure for the preview
+        resetExposureCompensation();
+
         /*
          * To reduce startup time, we start the preview in another thread.
          * We make sure the preview is started at the end of onCreate.
@@ -587,6 +594,16 @@ public class VideoModule implements CameraModule,
             mUI.overrideSettings(
                     CameraSettings.KEY_VIDEO_QUALITY,
                     Integer.toString(getLowVideoQuality()));
+        }
+    }
+
+    private void resetExposureCompensation() {
+        String value = mPreferences.getString(CameraSettings.KEY_EXPOSURE,
+                CameraSettings.EXPOSURE_DEFAULT_VALUE);
+        if (!CameraSettings.EXPOSURE_DEFAULT_VALUE.equals(value)) {
+            Editor editor = mPreferences.edit();
+            editor.putString(CameraSettings.KEY_EXPOSURE, "0");
+            editor.apply();
         }
     }
 
@@ -898,6 +915,7 @@ public class VideoModule implements CameraModule,
 
         if (!mPreviewing && mStartPreviewThread == null) {
             resetEffect();
+            resetExposureCompensation();
             openCamera();
             if (mActivity.mOpenCameraFail) {
                 Util.showErrorAndFinish(mActivity,
@@ -1247,6 +1265,11 @@ public class VideoModule implements CameraModule,
         switch (keyCode) {
             case KeyEvent.KEYCODE_CAMERA:
                 mUI.pressShutter(false);
+                return true;
+            case KeyEvent.KEYCODE_POWER:
+                if (ActivityBase.mPowerShutter) {
+                    onShutterButtonClick();
+                }
                 return true;
         }
         return false;
@@ -1863,9 +1886,7 @@ public class VideoModule implements CameraModule,
                 mActivity.mCameraDevice.lock();
                 mActivity.mCameraDevice.waitDone();
                 if ((ApiHelper.HAS_SURFACE_TEXTURE &&
-                    !ApiHelper.HAS_SURFACE_TEXTURE_RECORDING) ||
-                    mActivity.getResources().getBoolean(
-                        R.bool.useVideoSnapshotWorkaround)) {
+                    !ApiHelper.HAS_SURFACE_TEXTURE_RECORDING)) {
                     stopPreview();
                     // Switch back to use SurfaceTexture for preview.
                     ((CameraScreenNail) mActivity.mCameraScreenNail).setOneTimeOnFrameDrawnListener(
@@ -2018,9 +2039,6 @@ public class VideoModule implements CameraModule,
         // Set video mode
         CameraSettings.setVideoMode(mParameters, true);
 
-        // Reduce purple noise
-        CameraSettings.setReducePurple(mParameters, true);
-
         // Clear any previously set scene mode values
         CameraSettings.resetSceneMode(mParameters);
 
@@ -2082,24 +2100,20 @@ public class VideoModule implements CameraModule,
         // The logic here is different from the logic in still-mode camera.
         // There we determine the preview size based on the picture size, but
         // here we determine the picture size based on the preview size.
-        if (!mActivity.getResources().getBoolean(R.bool.useVideoSnapshotWorkaround)) {
-            List<Size> supported = mParameters.getSupportedPictureSizes();
-            Size optimalSize = Util.getOptimalVideoSnapshotPictureSize(supported,
-                    (double) mDesiredPreviewWidth / mDesiredPreviewHeight);
-            Size original = mParameters.getPictureSize();
-            if (!original.equals(optimalSize)) {
-                mParameters.setPictureSize(optimalSize.width, optimalSize.height);
-            }
-            Log.v(TAG, "Video snapshot size is " + optimalSize.width + "x" +
-                    optimalSize.height);
-        } else {
-            // At least one device will get bus overflows if we set this too high
-            mParameters.setPictureSize(mProfile.videoFrameWidth, mProfile.videoFrameHeight);
+        List<Size> supported = mParameters.getSupportedPictureSizes();
+        Size optimalSize = Util.getOptimalVideoSnapshotPictureSize(supported,
+                (double) mDesiredPreviewWidth / mDesiredPreviewHeight);
+        Size original = mParameters.getPictureSize();
+        if (!original.equals(optimalSize)) {
+            mParameters.setPictureSize(optimalSize.width, optimalSize.height);
         }
+        Log.v(TAG, "Video snapshot size is " + optimalSize.width + "x" +
+                optimalSize.height);
 
         // Set JPEG quality.
-        int jpegQuality = CameraProfile.getJpegEncodingQualityParameter(mCameraId,
-                CameraProfile.QUALITY_HIGH);
+        int jpegQuality = Integer.parseInt(mPreferences.getString(
+                CameraSettings.KEY_VIDEOCAMERA_JPEG,
+                mActivity.getString(R.string.pref_camera_jpeg_default)));
         mParameters.setJpegQuality(jpegQuality);
 
         // Enable HFR mode for WVGA
@@ -2119,6 +2133,24 @@ public class VideoModule implements CameraModule,
             } else {
                 mParameters.setVideoHDRMode("off");
             }
+        }
+
+        // Color effect
+        String colorEffect = mPreferences.getString(
+                CameraSettings.KEY_VIDEOCAMERA_COLOR_EFFECT,
+                mActivity.getString(R.string.pref_camera_coloreffect_default));
+        if (Util.isSupported(colorEffect, mParameters.getSupportedColorEffects())) {
+            mParameters.setColorEffect(colorEffect);
+        }
+
+        // Set exposure compensation
+        int value = CameraSettings.readExposure(mPreferences);
+        int max = mParameters.getMaxExposureCompensation();
+        int min = mParameters.getMinExposureCompensation();
+        if (value >= min && value <= max) {
+            mParameters.setExposureCompensation(value);
+        } else {
+            Log.w(TAG, "invalid exposure range: " + value);
         }
 
         Util.dumpParameters(mParameters);
@@ -2304,6 +2336,7 @@ public class VideoModule implements CameraModule,
                 setCameraParameters();
             }
             mUI.updateOnScreenIndicators(mParameters, mPreferences);
+            mActivity.initPowerShutter(mPreferences);
         }
     }
 
@@ -2455,6 +2488,9 @@ public class VideoModule implements CameraModule,
     @Override
     public void updateCameraAppView() {
         if (!mPreviewing || mParameters.getFlashMode() == null) return;
+
+        // Setup Power shutter
+        mActivity.initPowerShutter(mPreferences);
 
         // When going to and back from gallery, we need to turn off/on the flash.
         if (!mActivity.mShowCameraAppView) {
